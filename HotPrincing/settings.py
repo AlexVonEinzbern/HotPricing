@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'knox',
+    'drf_yasg',
     'corsheaders',
     'scrap',
     'login',
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'drf_yasg.middleware.SwaggerExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'HotPrincing.urls'

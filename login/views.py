@@ -7,6 +7,11 @@ from .serializers import UserSerializer, RegisterSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view
+
+
 # Create your views here.
 
 # Register API
@@ -21,13 +26,22 @@ class RegisterAPI(generics.GenericAPIView):
         "user": UserSerializer(user, context=self.get_serializer_context()).data,
         "token": AuthToken.objects.create(user)[1]
         })
+    
+login_data = openapi.Parameter('data', openapi.IN_QUERY, description="", required=True, type=openapi.TYPE_OBJECT)
+# data_response = openapi.Response('response description', UserSerializer)
 
+# Login API
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
+    @swagger_auto_schema(
+            method='post', 
+            manual_parameters=[login_data], 
+            responses={201: ''})
+    @api_view(['POST'])
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user'] # type: ignore
         login(request, user)
-        return super(LoginAPI, self).post(request, format=None)
+        return super(LoginAPI, self).post(request, format=None) # type: ignore
