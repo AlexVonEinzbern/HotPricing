@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-fg)k830@vvb@=xfo+1!n%n=9a$9*zdoic=%p7*ar!=tq^!+&zy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hotpricing.onrender.com']
 
 
 # Application definition
