@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 
+# from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
@@ -27,18 +28,26 @@ class RegisterAPI(generics.GenericAPIView):
         "token": AuthToken.objects.create(user)[1]
         })
     
-login_data = openapi.Parameter('data', openapi.IN_QUERY, description="", required=True, type=openapi.TYPE_OBJECT)
-# data_response = openapi.Response('response description', UserSerializer)
+# login_data = openapi.Parameter('data', openapi.IN_QUERY, description="", required=True, type=openapi.TYPE_OBJECT)
+# data_response = openapi.Response('', openapi.Schema(
+#     type=openapi.TYPE_OBJECT,
+#     properties={
+#         "Token ": openapi.Schema(title='AuthToken',  
+#                                  description='', 
+#                                  type=openapi.TYPE_STRING),
+#     },
+#     required=["Token"],))
 
 # Login API
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
-    @swagger_auto_schema(
-            method='post', 
-            manual_parameters=[login_data], 
-            responses={201: ''})
-    @api_view(['POST'])
+    # @swagger_auto_schema(
+    #         method='post', 
+    #         request_body=AuthTokenSerializer,
+    #         responses={201: data_response},
+    #         security=[],)
+    # @api_view(['POST'])
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
