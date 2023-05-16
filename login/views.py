@@ -1,6 +1,4 @@
 from django.contrib.auth import login
-
-# from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
@@ -8,12 +6,16 @@ from .serializers import UserSerializer, RegisterSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import api_view
 
+from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
+
+# Home View
+class HomeView(LoginRequiredMixin, TemplateView):
+    template_name = "home.html"
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
