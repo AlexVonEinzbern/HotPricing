@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'scrap',
     'login',
-    'modifyUser',
+    'News',
 ]
 
 MIDDLEWARE = [
@@ -166,7 +166,7 @@ REST_FRAMEWORK = {
 LOGIN_URL = 'api/login/social'
 LOGOUT_URL = 'api/logout/social'
 LOGIN_REDIRECT_URL = 'home'
-MODIFYUSER_REDIRECT_URL = 'api/MofifyUSer'
+NEWS_REDIRECT_URL = 'api/news'
 
 SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('SOCIAL_AUTH_FACEBOOK_KEY')  # App ID
 SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('SOCIAL_AUTH_FACEBOOK_SECRET')  # App Secret
