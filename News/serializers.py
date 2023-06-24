@@ -6,6 +6,7 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = news
         fields = ('id', 'newname', 'image', 'title')
+    
 
 # RegisterNew Serializer
 class RegisterNewSerializer(serializers.ModelSerializer):
@@ -13,3 +14,5 @@ class RegisterNewSerializer(serializers.ModelSerializer):
         model = news
         fields = ('id', 'newname', 'image', 'title')
         read_only_fields = ('id')
+
+    

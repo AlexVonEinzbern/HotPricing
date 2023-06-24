@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'scrap',
     'login',
     'News',
+    'Hoteles',
 ]
 
 MIDDLEWARE = [
@@ -167,6 +168,7 @@ LOGIN_URL = 'api/login/social'
 LOGOUT_URL = 'api/logout/social'
 LOGIN_REDIRECT_URL = 'home'
 NEWS_REDIRECT_URL = 'api/news'
-
+SCRAP_URL = 'api/scrap'
+HOTELES_URL = 'api/hoteles'
 SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('SOCIAL_AUTH_FACEBOOK_KEY')  # App ID
 SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('SOCIAL_AUTH_FACEBOOK_SECRET')  # App Secret
