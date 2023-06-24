@@ -36,10 +36,10 @@ def scraping_view(request):
 
     # Inicializamos el navegador
     #driver.get('https://ayenda.com/co/hoteles/cali')
-    driver.get('https://ayenda.com/co/hoteles/medellin')
+    #driver.get('https://ayenda.com/co/hoteles/medellin')
     #driver.get('https://ayenda.com/co/hoteles/santa-marta')
     #driver.get('https://ayenda.com/co/hoteles/pereira')
-    #driver.get('https://ayenda.com/co/hoteles/popayan')
+    driver.get('https://ayenda.com/co/hoteles/popayan')
     #Obtén la altura total de la página
     page_height = driver.execute_script("return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
     final = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
