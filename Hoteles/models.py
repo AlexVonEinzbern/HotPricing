@@ -10,3 +10,5 @@ class Hoteles (models.Model):
     precio_ahora = models.DecimalField(max_digits=20, decimal_places=5)
     imagen_uno = models.BinaryField()
     imagen_dos = models.BinaryField()
+    visitas = models.IntegerField()
+    reservas = models.IntegerField()

@@ -4,4 +4,14 @@ from .models import Hoteles
 class HotelesSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Hoteles
-        fields = '__all__'
+        fields = ['id', 'ciudad', 'hotelname', 'direccion', 'precio_antes', 'precio_ahora', 'imagen_uno', 'imagen_dos', 'visitas', 'reservas']
+
+class HotelesVisitasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hoteles
+        fields = ['visitas']
+
+class HotelesReservasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hoteles
+        fields = ['reservas']

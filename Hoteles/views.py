@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Hoteles
-from .serializers import HotelesSerializer
+from .serializers import HotelesSerializer, HotelesVisitasSerializer,HotelesReservasSerializer
 from scrap.views import hotel_precio, hotel_nombre, hotel_direccion, hotel_imagenes, ciudad
 
 @api_view(['POST'])
@@ -13,11 +13,11 @@ def vista_registro(request):
     for c in range(len(hotel_nombre)):
         hotel = None
         if len(hotel_precio[c]) == 3:
-            hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])    
+            hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)    
         elif len(hotel_precio[c])==1:
-            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])
+            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
         else:
-            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])
+            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
         
         hotel.save()
 
@@ -30,18 +30,32 @@ def vista_registro(request):
 
     # Devolver una respuesta en formato JSON con los datos serializados
     
-
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def listar_hoteles(request):
-    # Obtener todos los registros de la base de datos
-    hoteles = Hoteles.objects.all()
+    if request.method == 'GET':
+        # Obtener todos los registros de la base de datos
+        hoteles = Hoteles.objects.all()
 
-    # Crear una instancia del serializador y pasar los objetos obtenidos
-    serializer = HotelesSerializer(hoteles, many=True)
+        # Crear una instancia del serializador y pasar los objetos obtenidos
+        serializer = HotelesSerializer(hoteles, many=True)
 
-    # Devolver una respuesta en formato JSON con los datos serializados
-    return Response(serializer.data)
+        # Devolver una respuesta en formato JSON con los datos serializados
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        # Crear una instancia del serializador con los datos recibidos en la solicitud
+        serializer = HotelesSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            # Guardar el objeto serializado en la base de datos
+            serializer.save()
+            return Response(serializer.data, status=201)  # Devolver respuesta con datos serializados y código de estado 201 (creado)
+        
+        return Response(serializer.errors, status=400)  # Devolver respuesta con errores de validación y código de estado 400 (solicitud incorrecta)
+
+
+
+
 
 @api_view(['GET'])
 def listar_hoteles_ciudad(request, ciudad):
@@ -53,6 +67,82 @@ def listar_hoteles_ciudad(request, ciudad):
 
     # Devolver una respuesta en formato JSON con los datos serializados
     return Response(serializer.data)
+
+@api_view(['POST'])
+def aumentar_visitas(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+        hotel.visitas=hotel.visitas+1
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Eliminar todos los objetos
+    hotel.save()
+
+    # Devolver una respuesta exitosa
+    return Response({"message": "Se aumento el contador"}, status=200)
+
+@api_view(['POST'])
+def aumentar_reservas(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+        hotel.reservas=hotel.reservas+1
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Eliminar todos los objetos
+    hotel.save()
+
+    # Devolver una respuesta exitosa
+    return Response({"message": "Se aumento el contador"}, status=200)
+
+@api_view(['GET'])
+def hotel_visitas(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Crear una instancia del serializador de visitas y pasar el objeto obtenido
+    serializer = HotelesVisitasSerializer(hotel)
+    # Devolver una respuesta en formato JSON con los datos serializados
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def hotel_reservas(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Crear una instancia del serializador de visitas y pasar el objeto obtenido
+    serializer = HotelesReservasSerializer(hotel)
+    # Devolver una respuesta en formato JSON con los datos serializados
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def listar_hoteles_id(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+        print(hotel.hotelname)
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Crear una instancia del serializador y pasar el objeto obtenido
+    serializer = HotelesSerializer(hotel)
+    # Devolver una respuesta en formato JSON con los datos serializados
+    return Response(serializer.data)
+
 
 @api_view(['DELETE'])
 def eliminar_registro(request, pk):
@@ -117,13 +207,13 @@ def scrap_hoteles(request):
             # Código para crear y guardar el nuevo objeto Hoteles
             if len(hotel_precio[c]) == 3:
                 print("entro no existe 1")
-                hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])    
+                hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)    
             elif len(hotel_precio[c])==1:
                 print("entro no existe 2")
-                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])
+                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
             else:
                 print("entro no existe 3")
-                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1])
+                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
             hotel.save()
             
     return Response({"message": "Los hoteles han sido actualizados exitosamente."}, status=200)
