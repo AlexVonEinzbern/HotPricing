@@ -6,3 +6,4 @@ class news (models.Model):
     newname = models.CharField(max_length=50)
     image = models.URLField (max_length=400)
     title = models.CharField(max_length=200)
+    contenido = models.CharField(max_length=200)
