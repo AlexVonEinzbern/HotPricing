@@ -14,6 +14,7 @@ hotel_precio=[]
 hotel_nombre=[]
 hotel_direccion=[]
 hotel_imagenes=[]
+hotel_url =[]
 ciudad = []
 def scraping_view(request):
     hotel_precio.clear()
@@ -65,7 +66,7 @@ def scraping_view(request):
             cantidad_hoteles= driver.find_element(By.XPATH, '/html/body/div[1]/main/div/nav/div/h1/span[1]')
             cantidad_hoteles_texto = cantidad_hoteles.text
             cantidad_hoteles_int = int(cantidad_hoteles_texto)
-            print("cantidad de hoteles p: ", cantidad_hoteles_int)
+            #print("cantidad de hoteles p: ", cantidad_hoteles_int)
             xpath_ciudad = "/html/body/div[1]/main/div/nav/div/h1/text()[last()]"
             #/html/body/div[1]/main/div/nav/div/h1/text()[2]
             #/html/body/div[1]/main/div/nav/div/h1/text()[1]
@@ -75,12 +76,13 @@ def scraping_view(request):
             print("ciudad: ", ciudad[0])
             b_=1
             ho=False
+            
         if lista:
             #print("cantidad de hoteles : ", cantidad_hoteles_int)
             
             b__=b_+1
             time.sleep(2)
-            print("b_: ",b_)
+            #print("b_: ",b_)
             xpath__ = f'/html/body/div[1]/main/div/section/a[{b_}]/div/div[1]/div'
             
             elemento_padre = driver.find_element(By.XPATH, xpath__)
@@ -110,14 +112,14 @@ def scraping_view(request):
                 if b_ == cantidad_hoteles_int:
                     lista=False 
             
-            print("lista: ", lista)        
+            #print("lista: ", lista)        
         new_height = driver.execute_script("return document.body.scrollHeight")
         scroll_position = driver.execute_script("return window.pageYOffset;")
         window_height = driver.execute_script("return window.innerHeight;")
         #corregir el if
         
         if scroll_position >= (new_height-window_height):
-            print("va hacer el break")
+            #print("va hacer el break")
             break
         new_height_=new_height
     # Agrega una espera explícita si es necesario esperar a que se cargue el contenido
@@ -173,7 +175,14 @@ def scraping_view(request):
         lista_imagenes.append(contenido_imagen_dos)
         hotel_imagenes.append(lista_imagenes)
 
+        #urls
+        url = driver.find_element(By.XPATH, f'/html/body/div/main/div/section/a[{a_}]')
+        href_url = url.get_attribute("href") 
+        hotel_url.append(href_url)
+
         a_=a_+1 
+
+        
 
     for c in range(len(hotel_nombre)):
         if len(hotel_precio[c]) == 3:
@@ -193,17 +202,15 @@ def scraping_view(request):
             print("Precio:", hotel_precio[c][1])
             print("")
 
-    print("tipo de ruta_imagen: ", type(ruta_imagen))
-    print("len hotel imagenes: ", len(hotel_imagenes))
-    print("len hotel imagenes d: ", len(hotel_imagenes[0]))
-    print("len hotel imagenes d: ", len(hotel_imagenes[1]))
-    print("len hotel imagenes d: ", len(hotel_imagenes[2]))
-    print("len hotel imagenes d: ", len(hotel_imagenes[3]))
-    print("len hotel imagenes d: ", len(hotel_imagenes[4]))
-    precio__=float(hotel_precio[0][2].replace("COP", "").replace(".","").replace(",", "."))
-    print("precio antes: ", precio__)
-    print("tipo precio antes: ", type(precio__))
-    print("ciudad: ", ciudad[0])
+    #print("tipo de ruta_imagen: ", type(ruta_imagen))
+    #print("len hotel imagenes: ", hotel_imagenes)
+    #print("len hotel imagenes d: ", hotel_url[0])
+    #print("len hotel imagenes d: ", hotel_url[1])
+    #print("len hotel imagenes d: ", hotel_url[2])
+    #print("len hotel imagenes d: ", hotel_url[3])
+    #print("len hotel imagenes d: ", hotel_url[4])
+    #print("ciudad: ", ciudad[0])
+    
 
     response = HttpResponse(content_type='image/jpeg')
 

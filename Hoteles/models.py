@@ -12,3 +12,4 @@ class Hoteles (models.Model):
     imagen_dos = models.BinaryField()
     visitas = models.IntegerField()
     reservas = models.IntegerField()
+    urls = models.CharField(max_length=200)

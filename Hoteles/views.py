@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Hoteles
 from .serializers import HotelesSerializer, HotelesVisitasSerializer,HotelesReservasSerializer
-from scrap.views import hotel_precio, hotel_nombre, hotel_direccion, hotel_imagenes, ciudad
+from scrap.views import hotel_precio, hotel_nombre, hotel_direccion, hotel_imagenes, ciudad, hotel_url
 
 @api_view(['POST'])
 def vista_registro(request):
@@ -13,11 +13,11 @@ def vista_registro(request):
     for c in range(len(hotel_nombre)):
         hotel = None
         if len(hotel_precio[c]) == 3:
-            hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)    
+            hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])    
         elif len(hotel_precio[c])==1:
-            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
+            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])
         else:
-            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
+            hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])
         
         hotel.save()
 
@@ -129,6 +129,20 @@ def hotel_reservas(request, id):
     return Response(serializer.data)
 
 @api_view(['GET'])
+def hotel_url_(request, id):
+    try:
+        # Obtener hotel por su ID
+        hotel = Hoteles.objects.get(id=id)
+    except Hoteles.DoesNotExist:
+        # Si el hotel no existe, devolver una respuesta de error
+        return Response({"message": "El hotel no existe."}, status=404)
+
+    # Crear una instancia del serializador de visitas y pasar el objeto obtenido
+    serializer = HotelesUrlSerializer(hotel)
+    # Devolver una respuesta en formato JSON con los datos serializados
+    return Response(serializer.data)
+
+@api_view(['GET'])
 def listar_hoteles_id(request, id):
     try:
         # Obtener hotel por su ID
@@ -142,6 +156,7 @@ def listar_hoteles_id(request, id):
     serializer = HotelesSerializer(hotel)
     # Devolver una respuesta en formato JSON con los datos serializados
     return Response(serializer.data)
+
 
 
 @api_view(['DELETE'])
@@ -186,7 +201,7 @@ def scrap_hoteles(request):
                 hotel_filtrar.precio_ahora = float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", "."))
                 hotel_filtrar.imagen_uno = hotel_imagenes[c][0]
                 hotel_filtrar.imagen_dos =hotel_imagenes[c][1]
-                
+                hotel_filtrar.urls = hotel_url[c]
             elif len(hotel_precio[c])==1:
                 print("entro 1 if")
                 hotel_filtrar.direccion = hotel_direccion[c]
@@ -194,7 +209,7 @@ def scrap_hoteles(request):
                 hotel_filtrar.precio_ahora = 0
                 hotel_filtrar.imagen_uno = hotel_imagenes[c][0]
                 hotel_filtrar.imagen_dos =hotel_imagenes[c][1]
-                
+                hotel_filtrar.urls = hotel_url[c]
             else:
                 print("entro 1 if")
                 hotel_filtrar.direccion = hotel_direccion[c]
@@ -202,18 +217,19 @@ def scrap_hoteles(request):
                 hotel_filtrar.precio_ahora = float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", "."))
                 hotel_filtrar.imagen_uno = hotel_imagenes[c][0]
                 hotel_filtrar.imagen_dos =hotel_imagenes[c][1]
+                hotel_filtrar.urls = hotel_url[c]
             hotel_filtrar.save()
         except Hoteles.DoesNotExist:
             # Código para crear y guardar el nuevo objeto Hoteles
             if len(hotel_precio[c]) == 3:
                 print("entro no existe 1")
-                hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)    
+                hotel = Hoteles(ciudad=ciudad[0],hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=float(hotel_precio[c][0].split()[1].replace("COP", "").replace(".","").replace(",", ".")),precio_ahora=float(hotel_precio[c][2].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])    
             elif len(hotel_precio[c])==1:
                 print("entro no existe 2")
-                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
+                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=0, imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])
             else:
                 print("entro no existe 3")
-                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0)
+                hotel = Hoteles(ciudad=ciudad[0], hotelname=hotel_nombre[c], direccion=hotel_direccion[c], precio_antes=0,precio_ahora=float(hotel_precio[c][1].replace("COP", "").replace(".","").replace(",", ".")), imagen_uno=hotel_imagenes[c][0], imagen_dos=hotel_imagenes[c][1],visitas=0,reservas=0,urls=hotel_url[c])
             hotel.save()
             
     return Response({"message": "Los hoteles han sido actualizados exitosamente."}, status=200)
