@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Hoteles
-from .serializers import HotelesSerializer, HotelesVisitasSerializer,HotelesReservasSerializer
+from .serializers import HotelesSerializer, HotelesVisitasSerializer,HotelesReservasSerializer,HotelesUrlSerializer
 from scrap.views import hotel_precio, hotel_nombre, hotel_direccion, hotel_imagenes, ciudad, hotel_url
 
 @api_view(['POST'])
